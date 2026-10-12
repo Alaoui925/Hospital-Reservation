@@ -188,7 +188,7 @@ export async function createDoctor(payload) {
       gender: payload.gender || 'Prefer not to say',
       email,
       phone: payload.phone || '',
-      avatar: payload.avatar || '/images/doctors/doctor-1.svg',
+      avatar: payload.avatar || '/images/doctors/doctor-1.jpg',
       qualifications: payload.qualifications || '',
       experienceYears: Number(payload.experienceYears) || 0,
       fee: Number(payload.fee) || 0,

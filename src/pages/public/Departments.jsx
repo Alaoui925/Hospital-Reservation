@@ -6,6 +6,7 @@ import Input from '../../components/common/Input.jsx'
 import Loader from '../../components/common/Loader.jsx'
 import { Icon } from '../../components/common/Icon.jsx'
 import * as departmentService from '../../services/departmentService.js'
+import { getDepartmentImage } from '../../utils/departmentImages.js'
 
 export default function Departments() {
   const [departments, setDepartments] = useState([])
@@ -74,37 +75,48 @@ export default function Departments() {
           </div>
         ) : (
           <div className="grid grid-auto">
-            {filtered.map((dep) => (
-              <article key={dep.id} className="card card-hover" style={{ display: 'flex', flexDirection: 'column' }}>
-                <div className="card-body grow">
-                  <div className="row-between" style={{ alignItems: 'flex-start' }}>
-                    <div className="tile-icon" style={{ marginBottom: 14 }}>
-                      <Icon name={dep.icon} size={26} />
-                    </div>
-                    <span className="badge badge-brand">
-                      {dep.doctorCount} {dep.doctorCount === 1 ? 'doctor' : 'doctors'}
-                    </span>
-                  </div>
-                  <h3>{dep.name}</h3>
-                  <p className="text-sm text-muted">{dep.description.slice(0, 150)}…</p>
-                  <div className="row-wrap" style={{ gap: 6 }}>
-                    {(dep.services || []).slice(0, 3).map((service) => (
-                      <span key={service} className="badge badge-neutral">
-                        {service}
+            {filtered.map((dep) => {
+              const image = getDepartmentImage(dep)
+              return (
+                <article
+                  key={dep.id}
+                  className={`card card-hover${image ? ' dept-card' : ''}`}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    ...(image ? { backgroundImage: `url("${image}")` } : null),
+                  }}
+                >
+                  <div className="card-body grow">
+                    <div className="row-between" style={{ alignItems: 'flex-start' }}>
+                      <div className="tile-icon" style={{ marginBottom: 14 }}>
+                        <Icon name={dep.icon} size={26} />
+                      </div>
+                      <span className="badge badge-brand">
+                        {dep.doctorCount} {dep.doctorCount === 1 ? 'doctor' : 'doctors'}
                       </span>
-                    ))}
+                    </div>
+                    <h3>{dep.name}</h3>
+                    <p className="text-sm text-muted">{dep.description.slice(0, 150)}…</p>
+                    <div className="row-wrap" style={{ gap: 6 }}>
+                      {(dep.services || []).slice(0, 3).map((service) => (
+                        <span key={service} className="badge badge-neutral">
+                          {service}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                <div className="doctor-card-foot">
-                  <span className="text-xs text-muted">
-                    <Icon name="map-pin" size={13} /> {dep.floor}
-                  </span>
-                  <Button to={`/departments/${dep.slug}`} size="sm" iconRight="arrow-right">
-                    Details
-                  </Button>
-                </div>
-              </article>
-            ))}
+                  <div className="doctor-card-foot">
+                    <span className="text-xs text-muted">
+                      <Icon name="map-pin" size={13} /> {dep.floor}
+                    </span>
+                    <Button to={`/departments/${dep.slug}`} size="sm" iconRight="arrow-right">
+                      Details
+                    </Button>
+                  </div>
+                </article>
+              )
+            })}
           </div>
         )}
       </div>

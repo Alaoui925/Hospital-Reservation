@@ -605,7 +605,11 @@ code {
 .hero-bg {
   position: absolute;
   inset: 0;
-  background-image: url('/images/hospital-hero.jpg');
+  /* External stock photo (Unsplash) with the local file as a fallback layer
+     so the hero still renders if the CDN is unreachable. */
+  background-image:
+    url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1920&q=80'),
+    url('/images/hospital-hero.jpg');
   background-size: cover;
   background-position: center;
   opacity: 0.55;
@@ -678,6 +682,73 @@ code {
 }
 .tile h3 { font-size: var(--text-lg); margin-bottom: 6px; }
 .tile p { color: var(--ink-500); font-size: var(--text-sm); margin: 0; }
+
+/* Photo-backed department tiles & cards -----------------------------------
+   Department photos (public/images/departments) are set as inline
+   background-image; these rules add the covering overlay and switch the text
+   to a light theme so the white card surface becomes the picture. */
+.tile-photo,
+.dept-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  color: #fff;
+  background-color: var(--ink-800);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-color: transparent;
+}
+.tile-photo::before,
+.dept-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transition: opacity 0.16s ease;
+}
+.tile-photo::before {
+  background: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.12) 0%,
+    rgba(15, 23, 42, 0.68) 55%,
+    rgba(13, 148, 136, 0.92) 100%
+  );
+}
+.dept-card::before {
+  background: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.62) 0%,
+    rgba(15, 23, 42, 0.78) 55%,
+    rgba(13, 148, 136, 0.92) 100%
+  );
+}
+.tile-photo:hover::before,
+.dept-card:hover::before { opacity: 0.86; }
+.tile-photo > *,
+.dept-card > * { position: relative; z-index: 1; }
+
+.tile-photo {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 260px;
+}
+.tile-photo .tile-photo-body { margin-top: 16px; }
+.tile-photo h3,
+.dept-card h3 { color: #fff; }
+.tile-photo p { color: rgba(255, 255, 255, 0.88); }
+.tile-photo .text-muted,
+.dept-card .text-muted { color: rgba(255, 255, 255, 0.8); }
+.tile-photo .tile-icon,
+.dept-card .tile-icon {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  backdrop-filter: blur(2px);
+}
+.dept-card .doctor-card-foot { border-top-color: rgba(255, 255, 255, 0.22); }
+.dept-card .badge-brand { background: rgba(255, 255, 255, 0.92); color: var(--brand-800); }
+.dept-card .badge-neutral { background: rgba(255, 255, 255, 0.16); color: #fff; }
 
 /* --------------------------------------------------------------------------
    12. Doctor cards

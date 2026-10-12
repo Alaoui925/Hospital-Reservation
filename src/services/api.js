@@ -21,7 +21,7 @@ import {
 } from './mockData.js'
 import { ROLES } from '../utils/constants.js'
 
-export const DB_KEY = 'medicare:hospital-db:v1'
+export const DB_KEY = 'medicare:hospital-db:v2'
 export const SESSION_KEY = 'medicare:session:v1'
 
 const LATENCY = Number(import.meta.env.VITE_MOCK_LATENCY_MS ?? 300)
@@ -39,7 +39,7 @@ function buildSeed() {
     appointments: seedAppointments(),
     notifications: seedNotifications(),
     contactMessages: seedContactMessages(),
-    meta: { version: 1, seededAt: new Date().toISOString() },
+    meta: { version: 2, seededAt: new Date().toISOString() },
   }
 }
 

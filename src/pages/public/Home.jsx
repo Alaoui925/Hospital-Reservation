@@ -8,6 +8,7 @@ import { Icon } from '../../components/common/Icon.jsx'
 import * as departmentService from '../../services/departmentService.js'
 import * as doctorService from '../../services/doctorService.js'
 import { HOSPITAL } from '../../utils/constants.js'
+import { getDepartmentImage } from '../../utils/departmentImages.js'
 
 const BENEFITS = [
   {
@@ -175,24 +176,35 @@ export default function Home() {
                     <div className="skeleton mt-1" style={{ height: 12, width: '85%' }} />
                   </div>
                 ))
-              : departments.map((dep) => (
-                  <Link
-                    key={dep.id}
-                    to={`/departments/${dep.slug}`}
-                    className="tile"
-                    style={{ display: 'block' }}
-                  >
-                    <div className="tile-icon" aria-hidden="true">
-                      <Icon name={dep.icon} size={26} />
-                    </div>
-                    <h3>{dep.name}</h3>
-                    <p>{dep.short}</p>
-                    <span className="text-xs text-muted mt-1" style={{ display: 'block' }}>
-                      {dep.doctorCount} {dep.doctorCount === 1 ? 'doctor' : 'doctors'} ·{' '}
-                      {dep.floor}
-                    </span>
-                  </Link>
-                ))}
+              : departments.map((dep) => {
+                  const image = getDepartmentImage(dep)
+                  return (
+                    <Link
+                      key={dep.id}
+                      to={`/departments/${dep.slug}`}
+                      className={`tile${image ? ' tile-photo' : ''}`}
+                      style={{
+                        display: 'block',
+                        ...(image ? { backgroundImage: `url("${image}")` } : null),
+                      }}
+                    >
+                      <div className="tile-icon" aria-hidden="true">
+                        <Icon name={dep.icon} size={26} />
+                      </div>
+                      <div className="tile-photo-body">
+                        <h3>{dep.name}</h3>
+                        <p>{dep.short}</p>
+                        <span
+                          className="text-xs text-muted mt-1"
+                          style={{ display: 'block' }}
+                        >
+                          {dep.doctorCount} {dep.doctorCount === 1 ? 'doctor' : 'doctors'} ·{' '}
+                          {dep.floor}
+                        </span>
+                      </div>
+                    </Link>
+                  )
+                })}
           </div>
 
           <div className="text-center mt-4">
