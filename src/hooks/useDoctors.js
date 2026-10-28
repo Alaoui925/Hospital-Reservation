@@ -93,7 +93,7 @@ export function useDoctor(id) {
     }
   }, [id])
 
-  return { doctor, loading, error }
+  return { doctor, setDoctor, loading, error }
 }
 
 /**

@@ -15,28 +15,38 @@ bookings. Administrators run the whole hospital from a dedicated console.
 
 ### Public site
 - Landing page with hero, search, departments and top-rated doctors
-- Department catalogue with details pages (`/departments/:slug`)
+- Department catalogue — same icon-card design as the landing page — with
+  details pages (`/departments/:slug`)
 - Doctor directory with search, filters, sorting and pagination (`/doctors`)
-- Doctor profiles with live availability and slot picker (`/doctors/:id`)
+- Doctor profiles with live availability, slot picker and **real patient
+  reviews** (`/doctors/:id`)
 - About & contact pages (contact submissions land in the admin inbox)
+- Patient & doctor registration (doctor sign-ups are applications reviewed
+  by an administrator)
 
 ### Patients
 - Book an appointment: department → doctor → date → slot (deep-linkable via
   `/patient/book?doctor=&date=&time=` or `/doctors?search=&department=`)
 - My appointments with confirm / reschedule / cancel flows
-- Appointment details timeline, notifications feed, profile & password management
+- **Medical records page** (`/patient/records`): diagnosis, prescription and
+  care instructions for every completed visit
+- **Profile photo upload** (client-side square crop + downscale)
+- Appointment details timeline, notifications feed, password management
 
 ### Doctors
 - Dashboard with today's schedule & upcoming visits
 - Confirm `/` complete `/` cancel appointments
+- **File visit reports** (diagnosis, prescription, follow-up) on completed visits
 - Availability editor (clinic days + half-hour slots)
-- Weekly schedule view; profile editing
+- Weekly schedule view; profile editing with photo upload
 
 ### Administrators
-- Overview dashboard with KPIs and recent activity
+- Overview dashboard with KPIs, pending-application counter and recent activity
 - Reports: monthly volume chart, status breakdown, department share, doctor workload
 - Manage appointments (change status, cancel, reassign doctor)
 - CRUD for doctors, departments; patient & user records; doctor schedules
+- **Doctor application review queue** (`/admin/applications`) — approve
+  provisions the account & listing, reject records a reason
 - Contact message inbox
 
 ## 🔑 Demo accounts
@@ -107,8 +117,12 @@ No component, hook, or route needs to change.
 
 ## ℹ️ Notes
 
-- The mock database lives under the `medicare:hospital-db:v1` key in
+- The mock database lives under the `medicare:hospital-db:v3` key in
   `localStorage` and is seeded relative to *today* so demos always look current.
-- `resetDB()` / `wipeDB()` in `src/services/api.js` re-seed / clear the store
-  (useful for a "reset demo data" button).
+- A "Reset demo data" button on the login page calls `resetDemoData()`
+  (which wipes and re-seeds the store — see `src/services/api.js`).
+- Doctor ratings are computed live from the `reviews` collection; a review is
+  one per patient per doctor.
+- Doctor registrations from the public form are stored as `doctorApplications`
+  and become real accounts only when an administrator approves them.
 - Dates are handled as local-time `YYYY-MM-DD` strings via `src/utils/formatDate.js`.

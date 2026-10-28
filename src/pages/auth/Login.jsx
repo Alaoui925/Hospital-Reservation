@@ -8,6 +8,7 @@ import { useToast } from '../../context/NotificationContext.jsx'
 import { DEMO_ACCOUNTS } from '../../utils/constants.js'
 import { getRoleHome } from '../../utils/permissions.js'
 import { validateLogin } from '../../utils/validation.js'
+import * as authService from '../../services/authService.js'
 
 const HIGHLIGHTS = [
   'Book and manage appointments in one place',
@@ -52,6 +53,10 @@ export default function Login() {
   const fillDemo = (account) => {
     setValues({ email: account.email, password: account.password })
     setErrors({})
+  }
+
+  const handleResetDemo = () => {
+    authService.resetDemoData().finally(() => window.location.reload())
   }
 
   return (
@@ -167,6 +172,9 @@ export default function Login() {
                 <code>{account.password}</code>
               </button>
             ))}
+            <button type="button" className="demo-reset mt-1" onClick={handleResetDemo}>
+              <Icon name="refresh" size={13} /> Reset demo data (restores the original seed)
+            </button>
           </div>
         </div>
       </div>

@@ -129,7 +129,7 @@ export const seedDepartments = () => [
     slug: 'dentistry',
     icon: 'tooth',
     color: '#06b6d4',
-    image: '/images/departments/dentisity.jpg',
+    image: '/images/departments/dentistry.jpg',
     short: 'Teeth & oral health',
     description:
       'Complete dental care for the whole family: routine check-ups, hygiene, fillings, root canal treatment, orthodontics and cosmetic dentistry.',
@@ -755,6 +755,151 @@ export const seedContactMessages = () => [
       'Does the hospital accept Meridian Health insurance for orthopedic procedures? I would like to book a consultation if so.',
     read: true,
     createdAt: stamp(5),
+  },
+]
+
+/** Real customer reviews (one per patient–doctor pair). */
+export const seedReviews = () => [
+  {
+    id: 'rev-1',
+    patientId: 'user-pat-1',
+    doctorId: 'doc-8',
+    appointmentId: 'apt-1003',
+    rating: 5,
+    comment:
+      'Dr. Bennett took the time to explain my blood results clearly and never made me feel rushed. Highly recommended.',
+    createdAt: stamp(14),
+  },
+  {
+    id: 'rev-2',
+    patientId: 'user-pat-2',
+    doctorId: 'doc-1',
+    appointmentId: 'apt-1011',
+    rating: 4,
+    comment:
+      'Very thorough ECG review. Dr. Khan gave a treatment plan I could actually follow. Waiting time was minimal.',
+    createdAt: stamp(10),
+  },
+  {
+    id: 'rev-3',
+    patientId: 'user-pat-4',
+    doctorId: 'doc-7',
+    appointmentId: 'apt-1009',
+    rating: 5,
+    comment:
+      'Excellent clinician. My updated glasses prescription is spot on and the whole visit was smooth.',
+    createdAt: stamp(8),
+  },
+  {
+    id: 'rev-4',
+    patientId: 'user-pat-3',
+    doctorId: 'doc-6',
+    appointmentId: 'apt-1012',
+    rating: 5,
+    comment:
+      'Gentle but honest about my wisdom tooth. The extraction plan was explained step by step.',
+    createdAt: stamp(6),
+  },
+  {
+    id: 'rev-5',
+    patientId: 'user-pat-1',
+    doctorId: 'doc-1',
+    appointmentId: null,
+    rating: 5,
+    comment:
+      'Referred to Dr. Khan for a cardiology opinion. Kind, precise and very well organised clinic.',
+    createdAt: stamp(30),
+  },
+  {
+    id: 'rev-6',
+    patientId: 'user-pat-2',
+    doctorId: 'doc-8',
+    appointmentId: null,
+    rating: 4,
+    comment: 'Sensible advice, short wait and a clean, calm practice.',
+    createdAt: stamp(26),
+  },
+  {
+    id: 'rev-7',
+    patientId: 'user-pat-4',
+    doctorId: 'doc-1',
+    appointmentId: null,
+    rating: 4,
+    comment: 'Skilled cardiologist. Would have liked a little more time for my own questions.',
+    createdAt: stamp(45),
+  },
+  {
+    id: 'rev-8',
+    patientId: 'user-pat-3',
+    doctorId: 'doc-2',
+    appointmentId: null,
+    rating: 5,
+    comment: 'Dr. Mensah made our little one feel safe for the whole vaccination visit.',
+    createdAt: stamp(21),
+  },
+]
+
+/** Visit reports written by doctors after a completed appointment. */
+export const seedMedicalRecords = () => [
+  {
+    id: 'mr-1003',
+    appointmentId: 'apt-1003',
+    patientId: 'user-pat-1',
+    doctorId: 'doc-8',
+    departmentId: 'dep-general',
+    visitDate: dayOffset(-21),
+    diagnosis: 'Mild hyperlipidaemia (borderline cholesterol). Otherwise healthy annual physical.',
+    prescription: [],
+    instructions:
+      'Follow a Mediterranean-style diet, reduce saturated fat, and exercise 30 minutes most days.',
+    followUpDate: dayOffset(160),
+    createdAt: stamp(21),
+    updatedAt: stamp(21),
+  },
+  {
+    id: 'mr-1009',
+    appointmentId: 'apt-1009',
+    patientId: 'user-pat-4',
+    doctorId: 'doc-7',
+    departmentId: 'dep-eye',
+    visitDate: dayOffset(-4),
+    diagnosis: 'Progressive myopia — prescription lenses refreshed.',
+    prescription: ['New corrective lens prescription issued (R: -2.25 / L: -2.50)'],
+    instructions: 'Wear the updated glasses for reading and screen work. No skin-contact issues.',
+    followUpDate: dayOffset(180),
+    createdAt: stamp(4),
+    updatedAt: stamp(4),
+  },
+  {
+    id: 'mr-1011',
+    appointmentId: 'apt-1011',
+    patientId: 'user-pat-2',
+    doctorId: 'doc-1',
+    departmentId: 'dep-cardio',
+    visitDate: dayOffset(-2),
+    diagnosis: 'ECG within normal limits. Palpitations consistent with benign ectopy.',
+    prescription: [],
+    instructions: 'Reduce caffeine and energy drinks. Log any episodes with duration and triggers.',
+    followUpDate: dayOffset(60),
+    createdAt: stamp(2),
+    updatedAt: stamp(2),
+  },
+  {
+    id: 'mr-1012',
+    appointmentId: 'apt-1012',
+    patientId: 'user-pat-3',
+    doctorId: 'doc-6',
+    departmentId: 'dep-dental',
+    visitDate: dayOffset(-7),
+    diagnosis: 'Impacted lower-right third molar — extraction advised.',
+    prescription: [
+      'Ibuprofen 400mg — one tablet twice daily for 3 days as needed for pain',
+      'Chlorhexidine 0.2% mouthwash — rinse twice daily for 5 days after extraction',
+    ],
+    instructions: 'Book the extraction within the next month. Avoid smoking 24h before the procedure.',
+    followUpDate: dayOffset(21),
+    createdAt: stamp(7),
+    updatedAt: stamp(7),
   },
 ]
 

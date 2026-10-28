@@ -108,6 +108,7 @@ export const PATIENT_NAV = [
   { to: '/patient', label: 'Dashboard', icon: 'grid', end: true },
   { to: '/patient/book', label: 'Book appointment', icon: 'calendar-plus' },
   { to: '/patient/appointments', label: 'My appointments', icon: 'calendar' },
+  { to: '/patient/records', label: 'Medical records', icon: 'clipboard-text' },
   { to: '/patient/notifications', label: 'Notifications', icon: 'bell' },
   { to: '/patient/profile', label: 'Profile', icon: 'user' },
 ]
@@ -124,6 +125,7 @@ export const ADMIN_NAV = [
   { section: 'Overview' },
   { to: '/admin', label: 'Dashboard', icon: 'grid', end: true },
   { to: '/admin/reports', label: 'Reports', icon: 'chart' },
+  { to: '/admin/applications', label: 'Applications', icon: 'user-plus' },
   { section: 'Manage' },
   { to: '/admin/appointments', label: 'Appointments', icon: 'calendar' },
   { to: '/admin/doctors', label: 'Doctors', icon: 'stethoscope' },

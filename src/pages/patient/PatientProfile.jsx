@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import Avatar from '../../components/common/Avatar.jsx'
+import AvatarUpload from '../../components/common/AvatarUpload.jsx'
 import Button from '../../components/common/Button.jsx'
 import ConfirmDialog from '../../components/common/ConfirmDialog.jsx'
 import Input from '../../components/common/Input.jsx'
@@ -269,7 +269,11 @@ export default function PatientProfile() {
 
         <aside className="sticky-aside stack-sm">
           <div className="card card-pad text-center">
-            <Avatar src={user?.avatar} name={user?.name} size="lg" className="mx-auto" />
+            <AvatarUpload
+              value={user?.avatar}
+              name={user?.name}
+              onChange={(avatar) => updateProfile({ avatar })}
+            />
             <h3 style={{ marginTop: 14, marginBottom: 2 }}>{user?.name}</h3>
             <p className="text-sm text-muted mb-1">{user?.email}</p>
             <span className="badge badge-brand">{ROLE_LABELS[user?.role]}</span>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import AppointmentTable from '../../components/appointments/AppointmentTable.jsx'
+import MedicalRecordModal from '../../components/appointments/MedicalRecordModal.jsx'
 import Button from '../../components/common/Button.jsx'
 import ConfirmDialog from '../../components/common/ConfirmDialog.jsx'
 import Input from '../../components/common/Input.jsx'
@@ -36,6 +37,7 @@ export default function DoctorAppointments() {
   const [toCancel, setToCancel] = useState(null)
   const [cancelReason, setCancelReason] = useState('')
   const [busy, setBusy] = useState(false)
+  const [recordTarget, setRecordTarget] = useState(null)
 
   const resetFilters = () => updateParams({ status: 'all', scope: 'all', search: '' })
 
@@ -135,6 +137,16 @@ export default function DoctorAppointments() {
                 {STATUS_STEPS[appt.status].label}
               </Button>
             )}
+            {appt.status === 'completed' && (
+              <Button
+                size="sm"
+                variant="secondary"
+                icon="clipboard-text"
+                onClick={() => setRecordTarget(appt)}
+              >
+                Report
+              </Button>
+            )}
             {['pending', 'confirmed'].includes(appt.status) && (
               <Button size="sm" variant="ghost" icon="x" onClick={() => setToCancel(appt)}>
                 Cancel
@@ -164,6 +176,13 @@ export default function DoctorAppointments() {
           wrapperClassName="mt-2"
         />
       </ConfirmDialog>
+
+      <MedicalRecordModal
+        open={Boolean(recordTarget)}
+        onClose={() => setRecordTarget(null)}
+        appointment={recordTarget}
+        doctor={{ id: user.doctorId, title: 'Dr.', name: user.name.replace(/^Dr\.?\s*/i, '') }}
+      />
     </>
   )
 }

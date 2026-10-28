@@ -9,13 +9,14 @@ import DashboardHeader from '../../components/dashboard/DashboardHeader.jsx'
 import { Icon } from '../../components/common/Icon.jsx'
 import { useToast } from '../../context/NotificationContext.jsx'
 import * as adminService from '../../services/adminService.js'
+import * as applicationService from '../../services/applicationService.js'
 import { formatCurrency, formatTime, relativeTime } from '../../utils/formatDate.js'
 
 const QUICK_ACTIONS = [
   { to: '/admin/appointments', icon: 'calendar', tone: 'brand', title: 'Appointments', text: 'Monitor bookings and confirm requests.' },
+  { to: '/admin/applications', icon: 'user-plus', tone: 'info', title: 'Doctor applications', text: 'Approve or reject join requests.' },
   { to: '/admin/doctors', icon: 'stethoscope', tone: 'success', title: 'Manage doctors', text: 'Add, edit or retire doctors.' },
-  { to: '/admin/departments', icon: 'building', tone: 'info', title: 'Departments', text: 'Keep the specialty catalogue in shape.' },
-  { to: '/admin/schedules', icon: 'clock', tone: 'warning', title: 'Schedules', text: 'Review each doctor’s availability.' },
+  { to: '/admin/departments', icon: 'building', tone: 'warning', title: 'Departments', text: 'Keep the specialty catalogue in shape.' },
 ]
 
 export default function AdminDashboard() {
@@ -23,14 +24,17 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState(null)
   const [activity, setActivity] = useState([])
   const [loading, setLoading] = useState(true)
+  const [pendingApplications, setPendingApplications] = useState(0)
 
   const load = async () => {
-    const [statsResult, activityResult] = await Promise.all([
+    const [statsResult, activityResult, pending] = await Promise.all([
       adminService.getDashboardStats(),
       adminService.getRecentActivity(7),
+      applicationService.getApplicationCount(),
     ])
     setStats(statsResult)
     setActivity(activityResult)
+    setPendingApplications(pending)
   }
 
   useEffect(() => {
@@ -72,6 +76,13 @@ export default function AdminDashboard() {
         <StatCard icon="check-circle" label="Completed" value={stats?.completed ?? 0} tone="success" hint="Visits finished" />
         <StatCard icon="dollar" label="Est. revenue" value={formatCurrency(stats?.estimatedRevenue ?? 0)} tone="success" hint="From completed visits" />
         <StatCard icon="users" label="Patients" value={stats?.totalPatients ?? 0} tone="info" hint={`${stats?.newPatientsThisMonth ?? 0} joined this month`} />
+        <StatCard
+          icon="user-plus"
+          label="Pending applications"
+          value={pendingApplications}
+          tone={pendingApplications > 0 ? 'warning' : 'info'}
+          hint={pendingApplications > 0 ? 'Doctors waiting for review' : 'Queue is clear'}
+        />
       </div>
 
       <div className="grid grid-2" style={{ gap: 18 }}>

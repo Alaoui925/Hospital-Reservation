@@ -97,6 +97,39 @@ export function validateDoctor(values = {}) {
   return { valid: Object.keys(errors).length === 0, errors }
 }
 
+/** Public doctor registration (application form). */
+export function validateDoctorApplication(values = {}) {
+  const errors = {}
+  if (!isRequired(values.name)) errors.name = 'Full name is required.'
+  else if (!minLength(values.name, 3)) errors.name = 'Name looks too short.'
+
+  if (!isRequired(values.email)) errors.email = 'Email is required.'
+  else if (!isEmail(values.email)) errors.email = 'Enter a valid email address.'
+
+  if (values.phone && !isPhone(values.phone)) errors.phone = 'Enter a valid phone number.'
+
+  if (!isRequired(values.password)) errors.password = 'Password is required.'
+  else if (!minLength(values.password, 6)) errors.password = 'Use at least 6 characters.'
+
+  if (!isRequired(values.confirmPassword)) errors.confirmPassword = 'Confirm your password.'
+  else if (values.confirmPassword !== values.password) errors.confirmPassword = 'Passwords do not match.'
+
+  if (!isRequired(values.departmentId)) errors.departmentId = 'Choose the department you are applying to.'
+  if (!isRequired(values.specialty)) errors.specialty = 'Add your specialty (e.g. Paediatric cardiology).'
+  if (!isRequired(values.qualifications)) errors.qualifications = 'Add your qualifications (e.g. MBBS, MD).'
+  if (!isRequired(values.fee)) errors.fee = 'Set the consultation fee you will charge.'
+  else if (Number(values.fee) <= 0) errors.fee = 'Fee must be greater than zero.'
+
+  if (values.experienceYears !== undefined && Number(values.experienceYears) < 0)
+    errors.experienceYears = 'Experience cannot be negative.'
+
+  if (values.bio !== undefined && !isRequired(values.bio)) errors.bio = 'Write a short bio for your future listing.'
+
+  if (values.acceptTerms === false) errors.acceptTerms = 'Please accept the terms to continue.'
+
+  return { valid: Object.keys(errors).length === 0, errors }
+}
+
 export function validateDepartment(values = {}) {
   return buildErrors({
     name: !isRequired(values.name) ? 'Department name is required.' : '',

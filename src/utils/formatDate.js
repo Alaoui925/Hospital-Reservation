@@ -82,16 +82,6 @@ export function weekdayShort(value) {
   return weekdayName(value).slice(0, 3)
 }
 
-/** Return the next `count` days (inclusive of today) as Date objects. */
-export function getUpcomingDays(count = 14, from = new Date()) {
-  const start = new Date(from.getFullYear(), from.getMonth(), from.getDate())
-  return Array.from({ length: count }, (_, i) => {
-    const d = new Date(start)
-    d.setDate(start.getDate() + i)
-    return d
-  })
-}
-
 export function startOfToday() {
   const now = new Date()
   return new Date(now.getFullYear(), now.getMonth(), now.getDate())

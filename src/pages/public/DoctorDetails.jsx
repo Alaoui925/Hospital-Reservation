@@ -1,46 +1,67 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import Avatar from '../../components/common/Avatar.jsx'
 import Button from '../../components/common/Button.jsx'
 import EmptyState from '../../components/common/EmptyState.jsx'
+import Input from '../../components/common/Input.jsx'
 import Loader from '../../components/common/Loader.jsx'
 import { Icon } from '../../components/common/Icon.jsx'
 import AvailabilitySlots from '../../components/doctors/AvailabilitySlots.jsx'
+import { useAuth } from '../../hooks/useAuth.js'
 import { useDoctor } from '../../hooks/useDoctors.js'
+import { useToast } from '../../context/NotificationContext.jsx'
 import * as doctorService from '../../services/doctorService.js'
+import * as reviewService from '../../services/reviewService.js'
 import { WEEKDAYS } from '../../utils/constants.js'
-import { formatCurrency, formatTime, relativeDayLabel } from '../../utils/formatDate.js'
+import { formatCurrency, formatTime, relativeDayLabel, relativeTime } from '../../utils/formatDate.js'
 
-const SAMPLE_REVIEWS = [
-  {
-    name: 'Verified patient',
-    rating: 5,
-    text: 'Took the time to explain everything clearly and never made me feel rushed. Highly recommended.',
-    when: '2 weeks ago',
-  },
-  {
-    name: 'Verified patient',
-    rating: 5,
-    text: 'Very thorough examination and a treatment plan I could actually follow. The whole visit was smooth.',
-    when: '1 month ago',
-  },
-  {
-    name: 'Verified patient',
-    rating: 4,
-    text: 'Excellent clinician. Waiting time was minimal and the staff were friendly.',
-    when: '3 months ago',
-  },
-]
+/** Five interactive stars used by the review form. */
+function StarPicker({ value, onChange }) {
+  return (
+    <div className="star-picker" role="radiogroup" aria-label="Your rating">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          role="radio"
+          aria-checked={value === star}
+          className={star <= value ? 'filled' : ''}
+          onClick={() => onChange(star)}
+        >
+          <Icon name="star" size={22} filled={star <= value} />
+        </button>
+      ))}
+    </div>
+  )
+}
 
 export default function DoctorDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { doctor, loading, error } = useDoctor(id)
+  const { user, isPatient } = useAuth()
+  const toast = useToast()
+  const { doctor, setDoctor, loading, error } = useDoctor(id)
 
   const [days, setDays] = useState([])
   const [date, setDate] = useState(null)
   const [availability, setAvailability] = useState(null)
   const [time, setTime] = useState('')
   const [slotsLoading, setSlotsLoading] = useState(false)
+
+  // Real patient reviews.
+  const [reviews, setReviews] = useState([])
+  const [reviewsLoading, setReviewsLoading] = useState(true)
+  const [reviewContext, setReviewContext] = useState(null)
+  const [rating, setRating] = useState(5)
+  const [comment, setComment] = useState('')
+  const [formErrors, setFormErrors] = useState({})
+  const [submittingReview, setSubmittingReview] = useState(false)
+
+  const refreshReviews = async (doctorId) => {
+    const list = await reviewService.getDoctorReviews(doctorId)
+    setReviews(list)
+    setReviewsLoading(false)
+  }
 
   // Upcoming days on which this doctor holds a clinic.
   useEffect(() => {
@@ -73,6 +94,56 @@ export default function DoctorDetails() {
       active = false
     }
   }, [doctor, date])
+
+  // Reviews + the visitor's review eligibility.
+  useEffect(() => {
+    let active = true
+    if (!doctor) return undefined
+    setReviewsLoading(true)
+    refreshReviews(doctor.id)
+    reviewService
+      .getReviewContext(doctor.id, isPatient ? user?.id : null)
+      .then((result) => active && setReviewContext(result))
+      .finally(() => active && setReviewsLoading(false))
+    return () => {
+      active = false
+    }
+  }, [doctor?.id, user?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const submitReview = async (event) => {
+    event.preventDefault()
+    const nextErrors = {}
+    if (!rating) nextErrors.rating = 'Pick a star rating.'
+    if (comment.trim().length < 10) nextErrors.comment = 'Tell us a little more (10+ characters).'
+    setFormErrors(nextErrors)
+    if (Object.keys(nextErrors).length > 0) return
+
+    setSubmittingReview(true)
+    try {
+      await reviewService.addReview({
+        patientId: user.id,
+        doctorId: doctor.id,
+        rating,
+        comment,
+        appointmentId: reviewContext?.appointmentId,
+      })
+      setComment('')
+      setRating(5)
+      const [freshDoctor, freshContext] = await Promise.all([
+        doctorService.getDoctorById(doctor.id),
+        reviewService.getReviewContext(doctor.id, user.id),
+      ])
+      setDoctor(freshDoctor)
+      setReviewContext(freshContext)
+      refreshReviews(doctor.id)
+      toast.success('Review published', 'Thank you — your feedback helps other patients.')
+    } catch (err) {
+      setFormErrors({ ...(err.fields || {}), form: err.message })
+      toast.error('Could not publish review', err.message)
+    } finally {
+      setSubmittingReview(false)
+    }
+  }
 
   if (loading) return <Loader label="Loading doctor profile…" />
 
@@ -138,7 +209,7 @@ export default function DoctorDetails() {
                       <span className="rating">
                         <Icon name="star" size={16} filled /> {doctor.rating}
                         <span className="text-xs text-muted" style={{ fontWeight: 400 }}>
-                          ({doctor.reviews} reviews)
+                          ({doctor.reviews} {doctor.reviews === 1 ? 'review' : 'reviews'})
                         </span>
                       </span>
                       <span className="text-sm text-muted row" style={{ gap: 6 }}>
@@ -219,24 +290,79 @@ export default function DoctorDetails() {
               <div className="card-header">
                 <h3>Patient reviews</h3>
                 <span className="badge badge-warning">
-                  <Icon name="star" size={12} filled /> {doctor.rating} average
+                  <Icon name="star" size={12} filled /> {doctor.rating || '—'} average · {doctor.reviews || 0}{' '}
+                  {doctor.reviews === 1 ? 'review' : 'reviews'}
                 </span>
               </div>
               <div className="card-body stack-sm">
-                {SAMPLE_REVIEWS.map((review, index) => (
-                  <div key={index} className="panel">
-                    <div className="row-between">
-                      <strong>{review.name}</strong>
-                      <span className="rating">
-                        {Array.from({ length: review.rating }).map((_, star) => (
-                          <Icon key={star} name="star" size={13} filled />
-                        ))}
-                      </span>
+                {/* Review form for eligible patients */}
+                {isPatient && reviewContext?.canReview && (
+                  <form className="panel" onSubmit={submitReview} noValidate>
+                    <strong>Your review of {doctor.title} {doctor.name}</strong>
+                    <div className=" mt-2" style={{ marginBottom: 10 }}>
+                      <StarPicker value={rating} onChange={setRating} />
                     </div>
-                    <p className="text-sm text-muted mt-1 mb-0">{review.text}</p>
-                    <span className="text-xs text-muted">{review.when}</span>
-                  </div>
-                ))}
+                    <Input
+                      as="textarea"
+                      name="review-comment"
+                      label="Your experience"
+                      placeholder="How was the visit? Did the doctor listen, explain clearly, keep the schedule?"
+                      value={comment}
+                      onChange={(event) => setComment(event.target.value)}
+                      error={formErrors.comment}
+                      rows={3}
+                    />
+                    {formErrors.form && (
+                      <div className="alert alert-danger mt-2" role="alert">
+                        <Icon name="alert-circle" size={18} />
+                        <span>{formErrors.form}</span>
+                      </div>
+                    )}
+                    <div className="mt-2">
+                      <Button type="submit" icon="paper-plane" loading={submittingReview}>
+                        Publish review
+                      </Button>
+                    </div>
+                  </form>
+                )}
+
+                {/* Eligibility hint */}
+                {reviewContext && !reviewContext.canReview && (
+                  <p className="text-sm text-muted" style={{ marginBottom: 4 }}>
+                    <Icon name="info" size={15} /> {reviewContext.reason}
+                  </p>
+                )}
+
+                {reviewsLoading ? (
+                  <Loader label="Loading reviews…" />
+                ) : reviews.length === 0 ? (
+                  !reviewContext?.canReview && (
+                    <div className="review-summary text-muted text-sm">
+                      No reviews yet —{' '}
+                      {isPatient ? ' book a visit and be the first to share your experience.' : ' verified patients can share their experience here after a completed visit.'}
+                    </div>
+                  )
+                ) : (
+                  reviews.map((review) => (
+                    <div key={review.id} className="panel review-summary">
+                      <div className="row-between">
+                        <div className="row" style={{ gap: 10 }}>
+                          <Avatar src={review.patientAvatar} name={review.patientName} size="sm" />
+                          <div>
+                            <strong className="review-author">{review.patientName}</strong>
+                            <div className="rating">
+                              {Array.from({ length: review.rating }).map((_, star) => (
+                                <Icon key={star} name="star" size={13} filled />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <span className="text-xs text-muted">{relativeTime(review.createdAt)}</span>
+                      </div>
+                      <p className="text-sm text-muted mt-1 mb-0">{review.comment}</p>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>

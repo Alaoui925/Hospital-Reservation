@@ -196,6 +196,8 @@ code {
 .mb-0 { margin-bottom: 0; }
 .mb-1 { margin-bottom: 8px; }
 .mb-2 { margin-bottom: 16px; }
+.mr-1 { margin-right: 8px; }
+.block { display: block; }
 .full-width { width: 100%; }
 
 .grid { display: grid; gap: 24px; }
@@ -624,6 +626,10 @@ code {
   position: relative;
   z-index: 2;
   padding: 92px 0 104px;
+  max-width: 720px;
+  margin-left: max(24px, calc((100% - 1200px) / 2 - 120px)); /* adjust the 120px */
+}
+.hero-inner > * {
   max-width: 720px;
 }
 .hero h1 {
@@ -1355,8 +1361,10 @@ table.data tbody tr:hover { background: var(--surface-alt); }
 .home .hero-content {
   position: relative;
   z-index: 2;
-  max-width: 660px;
 }
+/* Cap the text column at 660px but keep it left-aligned inside the container,
+   instead of centering the whole block in the hero. */
+.home .hero-content > * { max-width: 660px; }
 .home .hero .eyebrow {
   display: inline-flex;
   align-items: center;
@@ -1534,13 +1542,13 @@ table.data tbody tr:hover { background: var(--surface-alt); }
   border-radius: var(--r-lg);
 }
 
-/* Specialty cards -------------------------------------------------------- */
-.home .specialty-grid {
+/* Specialty cards (shared by the Home and Departments pages) ------------- */
+.specialty-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 20px;
 }
-.home .specialty-card {
+.specialty-card {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -1551,12 +1559,12 @@ table.data tbody tr:hover { background: var(--surface-alt); }
   border-radius: var(--r-lg);
   transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
 }
-.home .specialty-card:hover {
+.specialty-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
   border-color: var(--brand-200);
 }
-.home .specialty-icon {
+.specialty-icon {
   display: grid;
   place-items: center;
   width: 52px;
@@ -1566,22 +1574,22 @@ table.data tbody tr:hover { background: var(--surface-alt); }
   background: var(--brand-50);
   color: var(--brand-700);
 }
-.home .specialty-card h3 { margin: 0; font-size: var(--text-lg); }
-.home .specialty-card p { flex: 1; margin: 0; font-size: var(--text-sm); color: var(--ink-500); }
-.home .specialty-bottom {
+.specialty-card h3 { margin: 0; font-size: var(--text-lg); }
+.specialty-card p { flex: 1; margin: 0; font-size: var(--text-sm); color: var(--ink-500); }
+.specialty-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: 10px;
 }
-.home .specialty-bottom > span:first-child {
+.specialty-bottom > span:first-child {
   font-size: var(--text-xs);
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--ink-500);
 }
-.home .specialty-arrow {
+.specialty-arrow {
   display: grid;
   place-items: center;
   width: 34px;
@@ -1591,7 +1599,7 @@ table.data tbody tr:hover { background: var(--surface-alt); }
   color: var(--brand-700);
   transition: background 0.16s ease, color 0.16s ease;
 }
-.home .specialty-card:hover .specialty-arrow { background: var(--brand-600); color: #fff; }
+.specialty-card:hover .specialty-arrow { background: var(--brand-600); color: #fff; }
 
 /* Process ---------------------------------------------------------------- */
 .home .process-section { padding: 72px 0; background: var(--surface-alt); }
@@ -1750,6 +1758,7 @@ table.data tbody tr:hover { background: var(--surface-alt); }
   .home .care-note { display: none; }
   .home .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .home .specialty-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .specialty-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .home .home-doctor-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
@@ -1773,7 +1782,62 @@ table.data tbody tr:hover { background: var(--surface-alt); }
   .home .process-section { padding: 48px 0; }
   .home .stats { grid-template-columns: 1fr; gap: 16px; }
   .home .specialty-grid,
+  .specialty-grid,
   .home .home-doctor-grid { grid-template-columns: 1fr; }
   .home .promise-band { padding: 48px 0; }
   .home .cta { margin: 48px 0 56px; }
 }
+
+/* --------------------------------------------------------------------------
+   14. Reviews, medical records, avatar upload & applications (added)
+   -------------------------------------------------------------------------- */
+
+/* Star picker ------------------------------------------------------------- */
+.star-picker { display: inline-flex; gap: 2px; background: none; padding: 0; border: 0; cursor: pointer; }
+.star-picker button {
+  padding: 2px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: var(--brand-100);
+  transition: color 0.12s ease, transform 0.12s ease;
+}
+.star-picker button.filled { color: #fbbf24; }
+.star-picker button:hover { transform: scale(1.15); }
+.review-summary .rating { gap: 3px; color: #fbbf24; }
+
+/* Medical records ---------------------------------------------------------- */
+.record-card { border-left: 3px solid var(--brand-500); }
+.record-meds { margin: 8px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.record-meds li { display: flex; gap: 8px; align-items: flex-start; font-size: var(--text-sm); color: var(--ink-600); }
+.record-meds li .dot { flex: 0 0 auto; margin-top: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--brand-500); }
+
+/* Avatar upload ------------------------------------------------------------ */
+.avatar-upload-frame {
+  position: relative;
+  width: max-content;
+}
+.avatar-upload-edit {
+  position: absolute;
+  right: -6px;
+  bottom: -4px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--brand-600);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.16s ease;
+}
+.avatar-upload-edit:hover { background: var(--brand-700); }
+
+/* Applications queue -------------------------------------------------------- */
+.application-email { font-size: var(--text-sm); color: var(--ink-500); word-break: break-all; }
+
+/* Demo reset (login aside) -------------------------------------------------- */
+.demo-reset { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }
+.demo-reset:hover { color: var(--brand-600); }

@@ -1,4 +1,4 @@
-import { ApiError, request, session, store, toPublicUser, uid } from './api.js'
+import { ApiError, request, session, store, toPublicUser, uid, wipeDB } from './api.js'
 import { ROLES } from '../utils/constants.js'
 
 /**
@@ -22,6 +22,18 @@ export async function login({ email, password }) {
   return request(() => {
     const user = store.findBy('users', (u) => normalizeEmail(u.email) === normalizeEmail(email))
     if (!user || user.password !== password) {
+      const application = store.findBy('doctorApplications', (a) => a.email === normalizeEmail(email))
+      if (application && application.status === 'pending') {
+        throw new ApiError(
+          'Your doctor application is still under review. Sign-in opens once an administrator approves it.',
+          { status: 403 },
+        )
+      }
+      if (application && application.status === 'rejected') {
+        throw new ApiError('Your doctor application was not approved. Please contact the hospital administration.', {
+          status: 403,
+        })
+      }
       throw new ApiError('Incorrect email or password. Please try again.', { status: 401 })
     }
     return issueSession(user)
@@ -149,6 +161,14 @@ export async function deleteAccount(userId) {
   return request(() => {
     session.clear()
     store.remove('users', userId)
+    return { success: true }
+  })
+}
+
+/** Demo helper: restore the seeded dataset (promised on the login screen). */
+export async function resetDemoData() {
+  return request(() => {
+    wipeDB()
     return { success: true }
   })
 }

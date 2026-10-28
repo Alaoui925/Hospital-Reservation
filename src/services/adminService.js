@@ -1,6 +1,6 @@
 import { ApiError, request, store, toPublicUser, uid } from './api.js'
 import { APPOINTMENT_STATUS, ROLES } from '../utils/constants.js'
-import { addDays, parseISODate, toISODate } from '../utils/formatDate.js'
+import { addDays, toISODate } from '../utils/formatDate.js'
 
 /** Admin analytics, user management and reporting. */
 
@@ -244,5 +244,3 @@ export async function deleteContactMessage(id) {
 export function appointmentsOn(date) {
   return store.find('appointments', (a) => a.date === toISODate(date))
 }
-
-export const _helpers = { parseISODate }

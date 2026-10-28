@@ -26,6 +26,7 @@ import PatientDashboard from '../pages/patient/PatientDashboard.jsx'
 import BookAppointment from '../pages/patient/BookAppointment.jsx'
 import MyAppointments from '../pages/patient/MyAppointments.jsx'
 import AppointmentDetails from '../pages/patient/AppointmentDetails.jsx'
+import MedicalRecords from '../pages/patient/MedicalRecords.jsx'
 import PatientProfile from '../pages/patient/PatientProfile.jsx'
 import Notifications from '../pages/patient/Notifications.jsx'
 
@@ -40,6 +41,7 @@ import DoctorProfile from '../pages/doctor/DoctorProfile.jsx'
 import AdminDashboard from '../pages/admin/AdminDashboard.jsx'
 import AdminReports from '../pages/admin/AdminReports.jsx'
 import AdminAppointments from '../pages/admin/AdminAppointments.jsx'
+import AdminApplications from '../pages/admin/AdminApplications.jsx'
 import AdminDoctors from '../pages/admin/AdminDoctors.jsx'
 import AdminPatients from '../pages/admin/AdminPatients.jsx'
 import AdminDepartments from '../pages/admin/AdminDepartments.jsx'
@@ -88,6 +90,7 @@ export default function AppRouter() {
           <Route path="/patient/book" element={<BookAppointment />} />
           <Route path="/patient/appointments" element={<MyAppointments />} />
           <Route path="/patient/appointments/:id" element={<AppointmentDetails />} />
+          <Route path="/patient/records" element={<MedicalRecords />} />
           <Route path="/patient/profile" element={<PatientProfile />} />
           <Route path="/patient/notifications" element={<Notifications />} />
         </Route>
@@ -110,6 +113,7 @@ export default function AppRouter() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/reports" element={<AdminReports />} />
           <Route path="/admin/appointments" element={<AdminAppointments />} />
+          <Route path="/admin/applications" element={<AdminApplications />} />
           <Route path="/admin/doctors" element={<AdminDoctors />} />
           <Route path="/admin/patients" element={<AdminPatients />} />
           <Route path="/admin/departments" element={<AdminDepartments />} />

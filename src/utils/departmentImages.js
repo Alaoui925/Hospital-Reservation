@@ -15,7 +15,7 @@ const IMAGE_BY_SLUG = {
   dermatology: '/images/departments/Dermatology.jpg',
   neurology: '/images/departments/Neurology.jpg',
   orthopedics: '/images/departments/Orthopedics.jpg',
-  dentistry: '/images/departments/dentisity.jpg',
+  dentistry: '/images/departments/dentistry.jpg',
   ophthalmology: '/images/departments/Ophthalmology.jpg',
   'general-medicine': '/images/departments/General%20Medicine.jpg',
 }

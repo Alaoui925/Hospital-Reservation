@@ -182,7 +182,7 @@ export default function Home() {
             The right specialists. Care that listens. A healthier tomorrow starts with a
             simple appointment.
           </p>
-          <div className="hero-actions">
+          <div className="hero-actions ">
             <Button to="/patient/book" size="lg" icon="calendar-plus">
               Book an appointment
             </Button>

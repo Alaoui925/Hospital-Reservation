@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import Avatar from '../../components/common/Avatar.jsx'
+import AvatarUpload from '../../components/common/AvatarUpload.jsx'
 import Button from '../../components/common/Button.jsx'
 import Input from '../../components/common/Input.jsx'
 import Loader from '../../components/common/Loader.jsx'
@@ -257,7 +257,20 @@ export default function DoctorProfile() {
 
         <aside className="sticky-aside stack-sm">
           <div className="card card-pad text-center">
-            <Avatar src={doctor?.avatar} name={doctor?.name} size="lg" className="mx-auto" />
+            <AvatarUpload
+              value={doctor?.avatar}
+              name={doctor?.name}
+              onChange={async (avatar) => {
+                try {
+                  await updateProfile({ avatar })
+                  const fresh = await doctorService.getDoctorByUserId(user.id)
+                  setDoctor(fresh)
+                  toast.success('Photo updated', 'Your new photo appears on your public listing.')
+                } catch (error) {
+                  toast.error('Could not update photo', error.message)
+                }
+              }}
+            />
             <h3 style={{ marginTop: 14, marginBottom: 2 }}>
               {doctor?.title} {doctor?.name}
             </h3>

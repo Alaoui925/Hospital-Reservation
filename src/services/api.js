@@ -16,12 +16,13 @@ import {
   seedContactMessages,
   seedDepartments,
   seedDoctors,
+  seedMedicalRecords,
   seedNotifications,
+  seedReviews,
   seedUsers,
 } from './mockData.js'
-import { ROLES } from '../utils/constants.js'
 
-export const DB_KEY = 'medicare:hospital-db:v2'
+export const DB_KEY = 'medicare:hospital-db:v3'
 export const SESSION_KEY = 'medicare:session:v1'
 
 const LATENCY = Number(import.meta.env.VITE_MOCK_LATENCY_MS ?? 300)
@@ -32,14 +33,28 @@ function buildSeed() {
   const departments = seedDepartments()
   const doctors = seedDoctors()
   const users = seedUsers(doctors)
+  const reviews = seedReviews()
+
+  // Make the advertised rating / review counts agree with the seeded reviews.
+  doctors.forEach((doctor) => {
+    const list = reviews.filter((r) => r.doctorId === doctor.id)
+    doctor.rating = list.length
+      ? Math.round((list.reduce((sum, r) => sum + r.rating, 0) / list.length) * 10) / 10
+      : 0
+    doctor.reviews = list.length
+  })
+
   return {
     departments,
     doctors,
     users,
     appointments: seedAppointments(),
+    reviews,
+    medicalRecords: seedMedicalRecords(),
+    doctorApplications: [],
     notifications: seedNotifications(),
     contactMessages: seedContactMessages(),
-    meta: { version: 2, seededAt: new Date().toISOString() },
+    meta: { version: 3, seededAt: new Date().toISOString() },
   }
 }
 
@@ -214,5 +229,4 @@ export async function request(work, { ms = LATENCY } = {}) {
   return result
 }
 
-export const ROLE = ROLES
 export { LATENCY }
