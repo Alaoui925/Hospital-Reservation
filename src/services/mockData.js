@@ -375,7 +375,7 @@ export const seedDoctors = () => [
   },
 ]
 
-export const seedUsers = (doctors) => [
+const seedUserList = (doctors) => [
   {
     id: 'user-admin',
     name: 'Amelia Foster',
@@ -467,6 +467,9 @@ export const seedUsers = (doctors) => [
     createdAt: stamp(60),
   },
 ]
+
+/** All seeded accounts start verified — email verification only applies to new sign-ups. */
+export const seedUsers = (doctors) => seedUserList(doctors).map((user) => ({ ...user, emailVerified: true }))
 
 export const seedAppointments = () => [
   {

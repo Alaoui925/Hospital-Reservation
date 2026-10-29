@@ -7,7 +7,6 @@ import { Icon } from '../../components/common/Icon.jsx'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useToast } from '../../context/NotificationContext.jsx'
 import { passwordStrength, validateDoctorApplication, validateRegister } from '../../utils/validation.js'
-import { getRoleHome } from '../../utils/permissions.js'
 import * as applicationService from '../../services/applicationService.js'
 import * as departmentService from '../../services/departmentService.js'
 
@@ -83,14 +82,17 @@ export default function Register() {
       if (isDoctor) {
         await submitDoctorApplication()
       } else {
-        const user = await register({
+        const result = await register({
           name: values.name,
           email: values.email,
           phone: values.phone,
           password: values.password,
         })
-        toast.success('Account created', `Welcome to MediCare, ${user.name.split(' ')[0]}!`)
-        navigate(getRoleHome(user.role), { replace: true })
+        toast.info(
+          'Verify your email',
+          `We sent a 6-digit code to ${result.email}. Enter it to activate your account.`,
+        )
+        navigate('/verify-email', { state: { email: result.email }, replace: true })
       }
     } catch (error) {
       setErrors({ form: error.message, ...(error.fields || {}) })

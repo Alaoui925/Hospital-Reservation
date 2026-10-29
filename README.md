@@ -49,6 +49,44 @@ bookings. Administrators run the whole hospital from a dedicated console.
   provisions the account & listing, reject records a reason
 - Contact message inbox
 
+## 🔐 Email verification & social login
+
+New patient sign-ups verify their email with a **6-digit code** before their
+account is active; the flow state shows as an amber banner while unverified and
+booking unlocks once the code is accepted. Google / GitHub / Facebook
+sign-in buttons live on the login page — social accounts are always patients and
+arrive auto-verified. Admin and doctor accounts stay manual (approved via the
+admin console).
+
+Two modes, switched by one env var (`.env.local`):
+
+| Mode | `VITE_AUTH_MODE` | Emails | Social buttons |
+|---|---|---|---|
+| Demo fallback *(default)* | `demo` | simulated — the code appears in a "Demo mailbox" box on the verify screen | disabled with an explanatory hint |
+| Supabase | `supabase` | real 6-digit code emails (Supabase Email OTP) | live OAuth (Google / GitHub / Facebook) |
+
+### Enable Supabase (real emails + social login)
+
+1. Create a free project at [supabase.com](https://supabase.com) and copy the
+   **Project URL** and **anon public key** (Project Settings → API).
+2. Auth configuration in the dashboard:
+   - **Authentication → Sign In / Up → Email**: turn **"Confirm email" OFF**
+     (the app's own 6-digit flow is the verification step).
+   - **Authentication → Emails**: use the **Magic Link** template with a
+     `{{ .Token }}` body so the mail contains the 6-digit code.
+3. Add the providers under **Authentication → Providers** — Google (client
+   ID/secret from [console.cloud.google.com](https://console.cloud.google.com)),
+   GitHub (OAuth app), Facebook (Meta developer app). Facebook/GitHub apps need
+   the real production domain, so they are optional for localhost demos.
+   For localhost, set the Site URL to `http://localhost:5173` under
+   **Authentication → URL Configuration**.
+4. Put the two values in `.env.local` and set `VITE_AUTH_MODE=supabase`, then
+   restart `npm run dev`.
+
+`VITE_SUPABASE_URL=…` and `VITE_SUPABASE_ANON_KEY=…` are public client-side
+values; secrets (provider client secrets) are stored only in the Supabase
+dashboard.
+
 ## 🔑 Demo accounts
 
 | Role | Email | Password |

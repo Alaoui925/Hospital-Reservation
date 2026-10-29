@@ -1810,3 +1810,89 @@ table.data tbody tr:hover { background: var(--surface-alt); }
 /* Demo reset (login aside) -------------------------------------------------- */
 .demo-reset { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }
 .demo-reset:hover { color: var(--brand-600); }
+
+/* Email verification & social sign-in -------------------------------------- */
+.verify-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px 14px;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  width: calc(100% - 48px);
+  margin: 12px auto 0;
+  padding: 10px 16px;
+  border: 1px solid #f0c96c;
+  border-radius: var(--r-md);
+  background: #fdf3d7;
+  color: #6b4b0a;
+  font-size: var(--text-sm);
+}
+.verify-banner > span { flex: 1 1 260px; }
+.verify-banner .btn { white-space: nowrap; }
+
+.social-login { margin-top: 14px; }
+.social-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  color: var(--ink-500);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.social-divider::before,
+.social-divider::after { content: ''; flex: 1; height: 1px; background: rgba(15, 23, 42, 0.1); }
+.social-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 8px;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  border-radius: var(--r-md);
+  background: #fff;
+  color: var(--ink-700);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.social-btn:hover:not(:disabled) { border-color: var(--brand-600); }
+.social-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.otp-input { letter-spacing: 0.45em; text-align: center; font-size: 1.3rem; }
+.demo-mailbox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  border: 1px dashed var(--brand-600);
+  border-radius: var(--r-md);
+  background: rgba(13, 148, 136, 0.08);
+  font-size: var(--text-sm);
+}
+.demo-mailbox span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-700);
+}
+.demo-mailbox code {
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--brand-600);
+  font-size: 1.05rem;
+}
+.verify-gate {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 20px 22px;
+}
+.verify-gate > svg:first-child { color: var(--brand-600); flex: 0 0 auto; }

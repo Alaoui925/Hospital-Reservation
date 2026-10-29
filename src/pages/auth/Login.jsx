@@ -9,6 +9,7 @@ import { DEMO_ACCOUNTS } from '../../utils/constants.js'
 import { getRoleHome } from '../../utils/permissions.js'
 import { validateLogin } from '../../utils/validation.js'
 import * as authService from '../../services/authService.js'
+import { SOCIAL_PROVIDERS, isDemoMode } from '../../services/authConfig.js'
 
 const HIGHLIGHTS = [
   'Book and manage appointments in one place',
@@ -38,7 +39,16 @@ export default function Login() {
 
     setSubmitting(true)
     try {
-      const user = await login(values)
+      const result = await login(values)
+      const user = result.user ?? result
+      if (result.requiresVerification) {
+        toast.info(
+          'Verify your email',
+          `We sent a 6-digit code to ${user.email}. Enter it to activate your account.`,
+        )
+        navigate('/verify-email', { state: { email: user.email }, replace: true })
+        return
+      }
       toast.success('Welcome back', `Signed in as ${user.name}.`)
       const redirect = location.state?.from?.pathname || getRoleHome(user.role)
       navigate(redirect, { replace: true })
@@ -47,6 +57,16 @@ export default function Login() {
       toast.error('Sign in failed', error.message)
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  const handleSocial = async (provider) => {
+    try {
+      await authService.signInWithProvider(provider)
+      // In supabase mode the browser navigates away to the provider's consent
+      // screen and comes back — AuthProvider picks up the session on return.
+    } catch (error) {
+      toast.error('Social sign-in unavailable', error.message)
     }
   }
 
@@ -143,6 +163,36 @@ export default function Login() {
               Sign in
             </Button>
           </form>
+
+          <div className="social-login">
+            <div className="social-divider">
+              <span>or continue with</span>
+            </div>
+            <div className="social-row">
+              {SOCIAL_PROVIDERS.map((provider) => (
+                <button
+                  key={provider.id}
+                  type="button"
+                  className="social-btn"
+                  disabled={isDemoMode}
+                  title={
+                    isDemoMode
+                      ? 'Social sign-in activates once Supabase is configured (see README)'
+                      : `Continue with ${provider.label}`
+                  }
+                  onClick={() => handleSocial(provider.id)}
+                >
+                  <Icon name={provider.icon} size={18} />
+                  <span>{provider.label}</span>
+                </button>
+              ))}
+            </div>
+            {isDemoMode && (
+              <p className="field-hint" style={{ textAlign: 'center', marginTop: 6 }}>
+                Demo mode — connect Supabase to enable Google / GitHub / Facebook.
+              </p>
+            )}
+          </div>
 
           <p className="text-sm text-center mt-3">
             New to MediCare? <Link to="/register">Create a free account</Link>

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import AppointmentForm from '../../components/appointments/AppointmentForm.jsx'
 import Button from '../../components/common/Button.jsx'
+import { Icon } from '../../components/common/Icon.jsx'
 import Loader from '../../components/common/Loader.jsx'
 import DashboardHeader from '../../components/dashboard/DashboardHeader.jsx'
 import { useAuth } from '../../hooks/useAuth.js'
@@ -66,6 +67,31 @@ export default function BookAppointment() {
   }
 
   if (!initialValues) return <Loader label="Preparing the booking form…" />
+
+  // Email verification gates booking — unverified accounts see a prompt instead.
+  if (user && user.emailVerified === false) {
+    return (
+      <>
+        <DashboardHeader
+          title="Book an appointment"
+          subtitle="Confirm your email to unlock online booking."
+        />
+        <div className="card verify-gate">
+          <Icon name="mail" size={28} />
+          <div className="grow">
+            <h3 style={{ fontSize: 'var(--text-lg)', marginBottom: 4 }}>Verify your email first</h3>
+            <p className="text-muted" style={{ margin: 0 }}>
+              We sent a 6-digit code to <strong>{user.email}</strong>. Enter it once and
+              booking unlocks immediately.
+            </p>
+          </div>
+          <Link to="/verify-email" state={{ email: user.email }} className="btn btn-primary">
+            Verify now
+          </Link>
+        </div>
+      </>
+    )
+  }
 
   return (
     <>

@@ -14,17 +14,26 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => authService.getSession()?.user ?? null)
   const [initializing, setInitializing] = useState(true)
 
-  // Re-hydrate & revalidate the session on first mount.
+  // Boot sequence: pick up any OAuth redirect / Supabase session first, then
+  // re-hydrate & revalidate the local session on first mount.
   useEffect(() => {
     let active = true
     authService
-      .getCurrentUser()
-      .then((fresh) => {
-        if (active && fresh) setUser(fresh)
+      .syncExternalSession()
+      .then((synced) => {
+        if (active && synced?.user) setUser(synced.user)
       })
       .catch(() => {})
       .finally(() => {
-        if (active) setInitializing(false)
+        authService
+          .getCurrentUser()
+          .then((fresh) => {
+            if (active && fresh) setUser(fresh)
+          })
+          .catch(() => {})
+          .finally(() => {
+            if (active) setInitializing(false)
+          })
       })
     return () => {
       active = false
@@ -32,15 +41,17 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = useCallback(async (credentials) => {
-    const { user: nextUser } = await authService.login(credentials)
-    setUser(nextUser)
-    return nextUser
+    // Keep the whole payload (session + requiresVerification) for the callers.
+    const result = await authService.login(credentials)
+    setUser(result.user)
+    return result
   }, [])
 
   const register = useCallback(async (payload) => {
-    const { user: nextUser } = await authService.register(payload)
-    setUser(nextUser)
-    return nextUser
+    // No session is issued yet — the user activates the account by entering
+    // the 6-digit code on the /verify-email screen.
+    const result = await authService.register(payload)
+    return result
   }, [])
 
   const logout = useCallback(() => {
