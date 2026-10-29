@@ -207,15 +207,6 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="care-note">
-          <span className="note-icon">
-            <Icon name="shield" size={20} />
-          </span>
-          <div>
-            <strong>Care you can feel confident in</strong>
-            <small>Experienced specialists. Personal attention.</small>
-          </div>
-        </div>
       </section>
 
       {/* Search bar overlapping the hero */}
